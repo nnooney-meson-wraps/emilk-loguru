@@ -1,4 +1,4 @@
-project('loguru', 'cpp',
+project('emilk-loguru', 'cpp',
   version: '2.1.0',
   license: 'Public Domain')
 
@@ -9,7 +9,7 @@ compile_opts = [
   '-DLOGURU_THREADNAME_WIDTH=@0@'.format(get_option('loguru_threadname_width')),
   '-DLOGURU_SCOPE_TIME_PRECISION=@0@'.format(get_option('loguru_scope_time_precision')),
 ]
-loguru_deps = [dependency('threads')]
+loguru_deps_internal = [dependency('threads')]
 
 if get_option('loguru_export') != ''
   compile_opts += ['-DLOGURU_EXPORT=' + get_option('loguru_export')]
@@ -36,7 +36,7 @@ if get_option('loguru_with_fileabs')
   compile_opts += ['-DLOGURU_WITH_FILEABS=1']
 endif
 if get_option('loguru_stacktraces')
-  loguru_deps += cxx.find_library('dl')
+  loguru_deps_internal += cxx.find_library('dl')
   compile_opts += ['-DLOGURU_STACKTRACES=1']
 endif
 if get_option('loguru_rtti')
@@ -47,21 +47,21 @@ if get_option('loguru_verbose_scope_endings')
 endif
 
 if get_option('loguru_use_fmtlib').enabled()
-  loguru_deps += dependency('fmt', required: true)
+  loguru_deps_internal += dependency('fmt', required: true)
 endif
 flags = cxx.get_supported_arguments(compile_opts)
 
-loguru_lib = library(
+emilk_loguru_lib = library(
   'loguru',
   files(
     'loguru.cpp'
   ),
   include_directories: include_directories('.'),
   cpp_args: flags,
-  dependencies: loguru_deps,
+  dependencies: loguru_deps_internal,
 )
-loguru_dep = declare_dependency(
+emilk_loguru_dep = declare_dependency(
   include_directories: include_directories('.'),
-  link_with: loguru_lib,
+  link_with: emilk_loguru_lib,
   compile_args: flags,
 )
